@@ -1,17 +1,20 @@
 #include "main.h"
 #include "led-matrix-c.h"
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
+#include <iostream>
+#include <string>
+// #include <unistd.h>
+#include <thread>
+#include <chrono>
 
 int main(int argc, char **argv) {
-    struct RGBLedMatrixOptions options;
+    using namespace std::chrono_literals;
+    struct RGBLedMatrixOptions options= {0};
     struct RGBLedMatrix *matrix;
     struct LedCanvas *offscreen_canvas;
     int width, height;
     int x, y, i;
 
-    memset(&options, 0, sizeof(options));
+ // memset(&options, 0, sizeof(options));
     options.rows = 32;
     options.chain_length = 1;
 
@@ -28,13 +31,14 @@ int main(int argc, char **argv) {
 
     led_canvas_get_size(offscreen_canvas, &width, &height);
 
-    fprintf(stderr, "Size: %dx%d. Hardware gpio mapping: %s\n",
-            width, height, options.hardware_mapping);
+    std::cout << "Size: " << width << "x" << height 
+	      << ". Hardware gpio mapping: " 
+	      << options.hardware_mapping << "\n";
 
-    for (i = 0; i < 1000; ++i) {
+    for (i = 0; i < 100; ++i) {
         for (y = 0; y < height; ++y) {
             for (x = 0; x < width; ++x) {
-                led_canvas_set_pixel(offscreen_canvas, x, y, i & 0xff, x, y);
+                led_canvas_set_pixel(offscreen_canvas, x, y, 0xff, 0xff, 0xff);
             }
         }
 
@@ -44,6 +48,8 @@ int main(int argc, char **argv) {
          * iteration.
          */
         offscreen_canvas = led_matrix_swap_on_vsync(matrix, offscreen_canvas);
+	std::this_thread::sleep_for(2000ms);
+
     }
 
     /*
