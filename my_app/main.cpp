@@ -6,57 +6,52 @@
 #include <thread>
 #include <chrono>
 
+volatile bool interrupt_received = false;
+static void InterruptHandler(int signo) {
+    interrupt_received = true;
+}
+
+static void DrawOnCanvas(Canvas *canvas) {
+    /*
+     * Let's create a simple animation. We use the canvas to draw
+     * pixels. We wait between each step to have a slower animation.
+     */
+    canvas->Fill(255, 255, 255);
+
+    int center_x = canvas->width() / 2;
+    int center_y = canvas->height() / 2;
+    float radius_max = canvas->width() / 2;
+    float angle_step = 1.0 / 360;
+    for (float a = 0, r = 0; r < radius_max; a += angle_step, r += angle_step) {
+        if (interrupt_received)
+            return;
+        float dot_x = cos(a * 2 * M_PI) * r;
+        float dot_y = sin(a * 2 * M_PI) * r;
+        canvas->SetPixel(center_x + dot_x, center_y + dot_y,
+                         255, 0, 0);
+        std::this_thread::sleep_for(100ms);
+    }
+}
+
 int main(int argc, char **argv) {
-    using namespace std::chrono_literals;
-    struct RGBLedMatrixOptions options= {0};
-    struct RGBLedMatrix *matrix;
-    struct LedCanvas *offscreen_canvas;
-    int width, height;
-    int x, y, i;
-
- // memset(&options, 0, sizeof(options));
-    options.rows = 32;
-    options.chain_length = 1;
-
-    /* This supports all the led commandline options. Try --led-help */
-    matrix = led_matrix_create_from_options(&options, &argc, &argv);
-    if (matrix == NULL)
+    RGBMatrix::Options defaults;
+    Canvas *canvas = RGBMatrix::CreateFromFlags(&argc, &argv, &defaults);
+    if (canvas == NULL)
         return 1;
 
-    /* Let's do an example with double-buffering. We create one extra
-     * buffer onto which we draw, which is then swapped on each refresh.
-     * This is typically a good aproach for animations and such.
-     */
-    offscreen_canvas = led_matrix_create_offscreen_canvas(matrix);
 
-    led_canvas_get_size(offscreen_canvas, &width, &height);
+    signal(SIGTERM, InterruptHandler);
+    signal(SIGINT, InterruptHandler);
 
-    std::cout << "Size: " << width << "x" << height 
-	      << ". Hardware gpio mapping: " 
-	      << options.hardware_mapping << "\n";
+    DrawOnCanvas(canvas);    // Using the canvas.
 
-    for (i = 0; i < 100; ++i) {
-        for (y = 0; y < height; ++y) {
-            for (x = 0; x < width; ++x) {
-                led_canvas_set_pixel(offscreen_canvas, x, y, 0xff, 0xff, 0xff);
-            }
-        }
-
-        /* Now, we swap the canvas. We give swap_on_vsync the buffer we
-         * just have drawn into, and wait until the next vsync happens.
-         * we get back the unused buffer to which we'll draw in the next
-         * iteration.
-         */
-        offscreen_canvas = led_matrix_swap_on_vsync(matrix, offscreen_canvas);
+    std::this_thread::sleep_for(500ms);
 	std::this_thread::sleep_for(2000ms);
 
-    }
+    // Animation finished. Shut down the RGB matrix.
+    canvas->Clear();
+    delete canvas;
 
-    /*
-     * Make sure to always call led_matrix_delete() in the end to reset the
-     * display. Installing signal handlers for defined exit is a good idea.
-     */
-    led_matrix_delete(matrix);
 
     return 0;
 }
