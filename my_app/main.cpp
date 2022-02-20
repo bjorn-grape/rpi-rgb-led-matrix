@@ -25,8 +25,8 @@ static void DrawOnCanvas(rgb_matrix::Canvas *canvas) {
     for (float a = 0, r = 0; r < radius_max; a += angle_step, r += angle_step) {
         if (interrupt_received)
             return;
-        float dot_x = std::cos(a * 2 * std::M_PI) * r;
-        float dot_y = std::sin(a * 2 * std::M_PI) * r;
+        float dot_x = std::cos(a * 2 * std::pi_v) * r;
+        float dot_y = std::sin(a * 2 * std::pi_v) * r;
         canvas->SetPixel(center_x + dot_x, center_y + dot_y,
                          255, 0, 0);
         std::this_thread::sleep_for(100ms);
