@@ -1,7 +1,7 @@
 CFLAGS=-Wall -O3 -g -Wextra -Wno-unused-parameter
 CXXFLAGS=$(CFLAGS)
-OBJECTS=demo-main.o minimal-example.o c-example.o text-example.o scrolling-text-example.o clock.o ledcat.o input-example.o pixel-mover.o
-BINARIES=demo minimal-example c-example text-example scrolling-text-example clock ledcat input-example pixel-mover
+OBJECTS=demo-main.o minimal-example.o c-example.o c-example2.o text-example.o scrolling-text-example.o clock.o ledcat.o input-example.o pixel-mover.o
+BINARIES=demo minimal-example c-example c-example2 text-example scrolling-text-example clock ledcat input-example pixel-mover
 
 # Where our library resides. You mostly only need to change the
 # RGB_LIB_DISTRIBUTION, this is where the library is checked out.
@@ -11,10 +11,6 @@ RGB_LIBDIR=$(RGB_LIB_DISTRIBUTION)/lib
 RGB_LIBRARY_NAME=rgbmatrix
 RGB_LIBRARY=$(RGB_LIBDIR)/lib$(RGB_LIBRARY_NAME).a
 LDFLAGS+=-L$(RGB_LIBDIR) -l$(RGB_LIBRARY_NAME) -lrt -lm -lpthread
-
-# To compile image-example
-MAGICK_CXXFLAGS?=$(shell GraphicsMagick++-config --cppflags --cxxflags)
-MAGICK_LDFLAGS?=$(shell GraphicsMagick++-config --ldflags --libs)
 
 all : $(BINARIES)
 
@@ -36,16 +32,15 @@ pixel-mover : pixel-mover.o
 % : %.o $(RGB_LIBRARY)
 	$(CXX) $< -o $@ $(LDFLAGS)
 
-image-example.o : image-example.cc
-	$(CXX) -I$(RGB_INCDIR) $(CXXFLAGS) $(MAGICK_CXXFLAGS) -c -o $@ $<
-
-image-example: image-example.o
-	$(CXX) $< -o $@ $(LDFLAGS) $(MAGICK_LDFLAGS)
 
 # Since the C example uses the C++ library underneath, which depends on C++
 # runtime stuff, you still have to also link -lstdc++
 c-example : c-example.o $(RGB_LIBRARY)
 	$(CC) $< -o $@ $(LDFLAGS) -lstdc++
+
+c-example2 : c-example2.o $(RGB_LIBRARY)
+	$(CC) $< -o $@ $(LDFLAGS) -lstdc++
+
 
 %.o : %.cc
 	$(CXX) -I$(RGB_INCDIR) $(CXXFLAGS) -c -o $@ $<
