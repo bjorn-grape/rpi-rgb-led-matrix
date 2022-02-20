@@ -19,7 +19,7 @@ add_library(rpi_rgb_led_matrix SHARED
 	../lib/hardware-mapping.c
 	)
 
-
+set_property(TARGET raspi_led  PROPERTY CXX_STANDARD 11)
 add_executable(raspi_led main.cpp)
 
 target_link_libraries(raspi_led rpi_rgb_led_matrix pthread rt m)
