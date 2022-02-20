@@ -34,6 +34,7 @@ static void DrawOnCanvas(Canvas *canvas) {
 }
 
 int main(int argc, char **argv) {
+    using namespace std::chrono_literals;
     RGBMatrix::Options defaults;
     Canvas *canvas = RGBMatrix::CreateFromFlags(&argc, &argv, &defaults);
     if (canvas == NULL)
