@@ -18,12 +18,22 @@ using namespace std::chrono_literals;
 static void DrawOnCanvas(rgb_matrix::Canvas *canvas) {
 
     for (unsigned i = 0; i < 1000; ++i) {
-        if (i % 3 == 0)
+        if (i % 7 == 0)
             canvas->Fill(255, 0, 0);
-        else if (i % 3 == 1)
+        else if (i % 7 == 1)
             canvas->Fill(0, 255, 0);
-        else if (i % 3 == 2)
+        else if (i % 7 == 2)
             canvas->Fill(0, 0, 255);
+        else if (i % 7 == 3)
+            canvas->Fill(0, 255, 255);
+        else if (i % 7 == 4)
+            canvas->Fill(255, 0, 255);
+        else if (i % 7 == 5)
+            canvas->Fill(255, 255, 255);
+        else if (i % 7 == 6)
+            canvas->Fill(255, 255, 0);
+
+
         std::this_thread::sleep_for(1000ms);
     }
 
