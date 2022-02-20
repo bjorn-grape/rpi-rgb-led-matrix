@@ -11,7 +11,7 @@ static void InterruptHandler(int signo) {
     interrupt_received = true;
 }
 
-static void DrawOnCanvas(Canvas *canvas) {
+static void DrawOnCanvas(rgb_matrix::Canvas *canvas) {
     /*
      * Let's create a simple animation. We use the canvas to draw
      * pixels. We wait between each step to have a slower animation.
@@ -35,8 +35,8 @@ static void DrawOnCanvas(Canvas *canvas) {
 
 int main(int argc, char **argv) {
     using namespace std::chrono_literals;
-    RGBMatrix::Options defaults;
-    Canvas *canvas = RGBMatrix::CreateFromFlags(&argc, &argv, &defaults);
+    rgb_matrix::RGBMatrix::Options defaults;
+    auto *canvas = rgb_matrix::RGBMatrix::CreateFromFlags(&argc, &argv, &defaults);
     if (canvas == NULL)
         return 1;
 
