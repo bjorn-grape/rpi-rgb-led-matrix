@@ -1,4 +1,4 @@
-CFLAGS=-Wall -O3 -g -Wextra -Wno-unused-parameter
+clCFLAGS=-Wall -O3 -g -Wextra -Wno-unused-parameter
 CXXFLAGS=$(CFLAGS)
 OBJECTS=demo-main.o minimal-example.o c-example.o c-example2.o text-example.o scrolling-text-example.o clock.o ledcat.o input-example.o pixel-mover.o
 BINARIES=demo minimal-example c-example c-example2 text-example scrolling-text-example clock ledcat input-example pixel-mover
