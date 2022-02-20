@@ -2,20 +2,20 @@
 #include "led-matrix.h"
 #include <iostream>
 #include <string>
-// #include <unistd.h>
+#include <signal.h>
 #include <thread>
 #include <chrono>
+#include <cmath>
 
 volatile bool interrupt_received = false;
 static void InterruptHandler(int signo) {
     interrupt_received = true;
 }
 
+using namespace std::chrono_literals;
+
 static void DrawOnCanvas(rgb_matrix::Canvas *canvas) {
-    /*
-     * Let's create a simple animation. We use the canvas to draw
-     * pixels. We wait between each step to have a slower animation.
-     */
+
     canvas->Fill(255, 255, 255);
 
     int center_x = canvas->width() / 2;
@@ -25,8 +25,8 @@ static void DrawOnCanvas(rgb_matrix::Canvas *canvas) {
     for (float a = 0, r = 0; r < radius_max; a += angle_step, r += angle_step) {
         if (interrupt_received)
             return;
-        float dot_x = cos(a * 2 * M_PI) * r;
-        float dot_y = sin(a * 2 * M_PI) * r;
+        float dot_x = std::cos(a * 2 * std::M_PI) * r;
+        float dot_y = std::sin(a * 2 * std::M_PI) * r;
         canvas->SetPixel(center_x + dot_x, center_y + dot_y,
                          255, 0, 0);
         std::this_thread::sleep_for(100ms);
@@ -34,7 +34,6 @@ static void DrawOnCanvas(rgb_matrix::Canvas *canvas) {
 }
 
 int main(int argc, char **argv) {
-    using namespace std::chrono_literals;
     rgb_matrix::RGBMatrix::Options defaults;
     auto *canvas = rgb_matrix::RGBMatrix::CreateFromFlags(&argc, &argv, &defaults);
     if (canvas == NULL)
